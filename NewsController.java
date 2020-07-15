@@ -1,24 +1,25 @@
 package com.example.demoRealTimeNews.resources;
 
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import org.apache.tomcat.util.http.parser.MediaType;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.awt.*;
+import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 public class NewsController {
 
     public List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
+
+
 
     //public Map<String, SseEmitter> emitters = new HashMap<>();
 
@@ -26,7 +27,7 @@ public class NewsController {
     //method for subscription
     @CrossOrigin
     @RequestMapping(value = "/subscribe")
-    public SseEmitter subscribe() {
+    public SseEmitter subscribe()  {
 
         SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
 
@@ -34,6 +35,7 @@ public class NewsController {
 
         emitters.add(sseEmitter);
         //emitters.put(UserID,sseEmitter);
+
 
         sseEmitter.onCompletion(()->emitters.remove(sseEmitter));
         sseEmitter.onTimeout(()->emitters.remove(sseEmitter));
@@ -52,37 +54,48 @@ public class NewsController {
 
 
 
+
     //method for dispatching events to all clients
     //to specific user
     @PostMapping(value = "/dispatchEvent")
-    public void dispatchEventToSpecificClient(@RequestParam int mumbaiCases, @RequestParam int puneCases,
-                                              @RequestParam int delhiCases,@RequestParam int bangaloreCases) throws JSONException {
+    public void dispatchEventToAllClients(@RequestParam String start) throws JSONException, InterruptedException {
 
-        String eventFormatted = new JSONObject()
-                .put("mumbaiCases",mumbaiCases)
-                .put("puneCases",puneCases)
-                .put("delhiCases",delhiCases)
-                .put("bangaloreCases",bangaloreCases).toString();
 
-//        SseEmitter sseEmitter = emitters.get(UserID);
-//        if(sseEmitter != null){
-//            try{
-//                sseEmitter.send(SseEmitter.event().name("latestNews").data(eventFormatted));
-//            }catch (IOException e){
-//                emitters.remove(sseEmitter);
-//                //e.printStackTrace();
-//            }
-//
-//        }
+        AtomicBoolean complete = new AtomicBoolean(true);
+        Random rand = new Random();
 
-        for( SseEmitter emitter : emitters){
-            try{
-                emitter.send(SseEmitter.event().name("latestNews").data(eventFormatted));
-            }catch (IOException e){
-                emitters.remove(emitter);
-                //e.printStackTrace();
+        while(complete.get()){
+
+
+            int mumbaiTemp=20 + rand.nextInt(25)%8;
+            int puneTemp=20 + rand.nextInt(25) % 8 ;
+            int delhiTemp=20 + rand.nextInt(25)% 8;
+            int bangaloreTemp=20 + rand.nextInt(25)% 8;
+
+
+            String eventFormatted = new JSONObject()
+                    .put("mumbaiTemp",mumbaiTemp)
+                    .put("puneTemp",puneTemp)
+                    .put("delhiTemp",delhiTemp)
+                    .put("bangaloreTemp",bangaloreTemp).toString();
+
+
+            for( SseEmitter emitter : emitters){
+                try{
+                    emitter.send(SseEmitter.event().name("latestNews").data(eventFormatted));
+                }catch (IOException e){
+                    emitter.onCompletion(()-> complete.set(false));
+                    emitters.remove(emitter);
+                    //e.printStackTrace();
+                }
             }
+
+            Thread.sleep(5000);
+
         }
+
+
+
 
     }
 

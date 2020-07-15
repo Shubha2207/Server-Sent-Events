@@ -50,7 +50,7 @@
 
 		.cases{
 			margin: 20px auto;
-			width: 30%;
+			width: 50%;
 		}
 		.cases ul li{
 			list-style: none;
@@ -64,11 +64,11 @@
 		}
 		.cases ul li p{
 			margin: auto;
-			width: 50%;
+			width: 70%;
 		}
 		.cases ul li span{
 			margin: auto;
-			width: 50%;
+			width: 20%;
 		}
 	</style>
 
@@ -89,7 +89,7 @@
 			eventSource.addEventListener("latestNews",function(event){
 
 				var articleData = JSON.parse(event.data);
-				addBlock(articleData.mumbaiCases, articleData.puneCases, articleData.delhiCases, articleData.bangaloreCases);
+				addBlock(articleData.mumbaiTemp, articleData.puneTemp, articleData.delhiTemp, articleData.bangaloreTemp);
 			})
 		})
 
@@ -128,16 +128,16 @@
 
 		<div class="container pstyle text-center" id="pack">
 			<div class="panel panel-primary">
-				COVID-19 UPDATES
+				WEATHER UPDATES
 			</div>
 		</div>
 
 		<div class="cases">
 			<ul>
-				<li><p>Mumbai</p> <span id="mumbai">0</span> </li>
-				<li><p>Pune</p> <span id="pune">0</span></li>
-				<li><p>Delhi</p> <span id="delhi">0</span></li>
-				<li><p>Bangalore</p> <span id="bangalore">0</span></li>
+				<li><p>Mumbai</p> <span id="mumbai">0</span> degree celsius </li>
+				<li><p>Pune</p> <span id="pune">0</span> degree celsius</li>
+				<li><p>Delhi</p> <span id="delhi">0</span> degree celsius</li>
+				<li><p>Bangalore</p> <span id="bangalore">0</span> degree celsius</li>
 			</ul>
 		</div>
 	</body>
